@@ -53,16 +53,16 @@ app.post('/api/shorturl', async (req, res) => {
   const url = req.body.url;
 
   if (!validUrl.isWebUri(url)) {
-    res.status(401).json({
-      error: 'Invalid URL'
+    return res.status(401).json({
+      error: 'invalid url'
     });
   }
 
   try {
     let nUrl = await URL.findOne({ original_url: url });
-    
+
     if (nUrl) {
-      res.json({
+      return res.json({
         original_url: nUrl.original_url,
         short_url: nUrl.short_url
       });
@@ -74,13 +74,13 @@ app.post('/api/shorturl', async (req, res) => {
     });
     await nUrl.save();
 
-    res.json({
+    return res.json({
       original_url: nUrl.original_url,
       short_url: nUrl.short_url
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json('Server error...');
+    return res.status(500).json('Server error...');
   }
 })
 
@@ -91,7 +91,7 @@ app.get('/api/shorturl/:url', async (req, res) => {
     const nUrl = await URL.findOne({ short_url });
 
     if (nUrl) {
-      return res.redirect(nUrl.original_url);
+      res.redirect(nUrl.original_url);
     } else {
       return res.status(404).json('No URL Found');
     }
